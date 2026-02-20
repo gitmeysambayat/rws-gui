@@ -67,6 +67,7 @@
   .range-foot{ display:flex; justify-content:space-between; margin-top:3px; font-size:10px; color:var(--muted); }
   .row{ display:flex; justify-content:space-between; gap:12px; align-items:baseline; }
   .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+  .mono.warn{ color:#b00020; font-weight:700; }
   .small{ font-size:11px; }
   .muted{ color:var(--muted); }
   .divider{ height:1px; background:var(--line2); margin:10px 0; }
@@ -225,7 +226,6 @@
 <body>
 <header>
   <div class="title">Reduced Web Section explorer (7575 models)</div>
-  <div class="subtitle">Backbone curves from envelope2.csv with key outputs and prequalification checks. Generated 2026-02-18 07:54.</div>
 </header>
 
 <main>
@@ -457,8 +457,7 @@
       <div class="plot-head">
         <div>
           <div class="plot-title">Backbone curve</div>
-          <div class="small muted" style="margin-top:3px;">Fixed x grid at -0.06, -0.04, -0.02, 0, 0.02, 0.04, 0.06 rad.</div>
-        </div>
+</div>
         <div class="btnbar">
           <button class="primary" id="btnPlot">Plot (replace)</button>
           <button id="btnAdd">Add curve</button>
@@ -476,18 +475,6 @@
 
     <div class="card">
       <h2>Column face contour plots</h2>
-      <div class="small muted" style="margin-bottom:6px;">
-        PEEQ and von Mises contours are loaded using filenames based on the selected model code.
-        Example: <span class="mono">contours/VonMises/S235/330/9.330.S235.C74_VonMises.png</span> (recommended) or <span class="mono">contours/VonMises/9.330.S235.C74_VonMises.png</span> (fallback).
-      </div>
-
-      <div class="contourCfg">
-        <div class="lbl">Contour base (optional)</div>
-        <input id="contourBase" class="textInput mono" type="text" placeholder="Leave blank for local: contours/  or paste a web URL, for example https://USERNAME.github.io/REPO/contours">
-        <button id="btnContourApply" class="btnMini">Apply</button>
-      </div>
-      <div class="small muted" id="contourBaseHint" style="margin-bottom:8px;"></div>
-
       <div class="contours">
         <div class="contourItem">
           <div class="contourHead">
@@ -515,9 +502,7 @@
           </div>
         </div>
       </div>
-
-      <div class="small muted" id="contourHint" style="margin-top:8px;"></div>
-    </div>
+</div>
   </section>
 </main>
 
@@ -758,22 +743,28 @@
   }
 
   function updateOutputs(r) {
+    const vm = r[schema.VonMises_CF_norm];
+    const pq = r[schema.PEEQ_CF_norm];
+    const st = r[schema.Stress_CF_over_Fy_norm];
+
     const out = [
-      ['<span class="sym"><i>M</i><sub>y</sub></span> (kN·m)', fmt1(r[schema.My_kNm])],
-      ['<span class="sym"><i>M</i><sub>c</sub></span> (kN·m)', fmt1(r[schema.Mc_kNm])],
-      ['<span class="sym"><i>M</i><sub>0.04</sub></span> (kN·m)', fmt1(r[schema.M0_04_kNm])],
-      ['<span class="sym"><i>M</i><sub>0.06</sub></span> (kN·m)', fmt1(r[schema.M0_06_kNm])],
-      ['<span class="sym"><i>M</i><sub>p</sub></span> (kN·m)', fmt1(r[schema.Mp_kNm])],
-      ['<span class="sym"><i>M</i><sub>p,RWS</sub></span> (kN·m)', fmt1(r[schema.Mp_RWS_kNm])],
-      ['<span class="sym"><i>θ</i><sub>y</sub></span> (rad)', fmt5(r[schema.theta_y_rad])],
-      ['<span class="sym"><i>θ</i><sub>c</sub></span> (rad)', fmt5(r[schema.theta_c_rad])],
-      ['von Mises at column face (normalised)', fmt2(r[schema.VonMises_CF_norm])],
-      ['PEEQ at column face (normalised)', fmt2(r[schema.PEEQ_CF_norm])],
-      ['Stress@CF/<span class="sym"><i>F</i><sub>y</sub></span> (normalised)', fmt2(r[schema.Stress_CF_over_Fy_norm])],
+      {lab:'<span class="sym"><i>M</i><sub>y</sub></span> (kN·m)', val: fmt1(r[schema.My_kNm])},
+      {lab:'<span class="sym"><i>M</i><sub>c</sub></span> (kN·m)', val: fmt1(r[schema.Mc_kNm])},
+      {lab:'<span class="sym"><i>M</i><sub>0.04</sub></span> (kN·m)', val: fmt1(r[schema.M0_04_kNm])},
+      {lab:'<span class="sym"><i>M</i><sub>0.06</sub></span> (kN·m)', val: fmt1(r[schema.M0_06_kNm])},
+      {lab:'<span class="sym"><i>M</i><sub>p</sub></span> (kN·m)', val: fmt1(r[schema.Mp_kNm])},
+      {lab:'<span class="sym"><i>M</i><sub>p,RWS</sub></span> (kN·m)', val: fmt1(r[schema.Mp_RWS_kNm])},
+      {lab:'<span class="sym"><i>θ</i><sub>y</sub></span> (rad)', val: fmt5(r[schema.theta_y_rad])},
+      {lab:'<span class="sym"><i>θ</i><sub>c</sub></span> (rad)', val: fmt5(r[schema.theta_c_rad])},
+      {lab:'von Mises at column face (normalised)', val: fmt2(vm), warn: (Number.isFinite(vm) && vm > 1)},
+      {lab:'PEEQ at column face (normalised)', val: fmt2(pq), warn: (Number.isFinite(pq) && pq > 1)},
+      {lab:'Stress@CF/<span class="sym"><i>F</i><sub>y</sub></span> (normalised)', val: fmt2(st), warn: (Number.isFinite(st) && st > 1)},
     ];
+
     let html = '';
-    for (const [lab,val] of out) {
-      html += `<tr><td>${lab}</td><td class="mono">${val}</td></tr>`;
+    for (const o of out) {
+      const cls = o.warn ? 'mono warn' : 'mono';
+      html += `<tr><td>${o.lab}</td><td class="${cls}">${o.val}</td></tr>`;
     }
     el.outTable.innerHTML = html;
 
