@@ -122,6 +122,35 @@
   .legitem.active{ outline:2px solid rgba(37,99,235,0.55); outline-offset:1px; }
   .figcap{ text-align:center; margin-top:6px; font-size:12px; }
 
+  /* Specimen classification selector (interactive) */
+  .specPick{ margin-top:10px; }
+  .specGrid{
+    display:grid;
+    grid-template-columns: 60px 18px 90px 18px 90px 18px 90px;
+    justify-content:center;
+    align-items:center;
+  }
+  .specTop{ margin-bottom:4px; font-size:11px; color:var(--muted); }
+  .specBottom{ margin-top:6px; font-size:11px; color:var(--muted); }
+  .specTop .left{ grid-column:1; text-align:center; font-weight:700; }
+  .specTop .right{ grid-column:5 / span 3; text-align:center; }
+  .specDot{ text-align:center; font-size:16px; font-weight:400; color:rgba(15,23,42,0.55); }
+  .specSel{
+    width:100%;
+    padding:6px 8px;
+    border-radius:8px;
+    border:1px solid rgba(15,23,42,0.35);
+    background:#fff;
+    font-family: Arial, sans-serif;
+    font-size:14px;
+    font-weight:700;
+    text-align:center;
+    text-align-last:center;
+  }
+  .specSel:focus{ outline:2px solid rgba(37,99,235,0.55); outline-offset:2px; }
+  .specBottom .lbl{ text-align:center; line-height:1.15; }
+
+
   /* Contour panels */
   .contours{
     display:grid;
@@ -360,65 +389,32 @@
 
       <div class="divider"></div>
       
-<svg viewBox="0 0 520 150" width="100%" height="150" aria-label="Specimen classification">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(15,23,42,0.75)"></path>
-    </marker>
-  </defs>
+<div class="specPick" aria-label="Specimen classification selector">
+  <div class="specGrid specTop">
+    <div class="left">Batch label</div>
+    <div class="right">Combination of (<span class="sym"><i>S</i>/<i>h</i></span>) and (<span class="sym"><i>d</i><sub>o</sub>/<i>h</i></span>)</div>
+  </div>
 
-  <!-- Code boxes -->
-  <g font-family="Arial, sans-serif" font-size="16" font-weight="700">
-    <rect x="60" y="55" rx="6" ry="6" width="55" height="34" fill="#ffffff" stroke="rgba(15,23,42,0.35)"/>
-    <text x="87.5" y="78" text-anchor="middle">6</text>
+  <div class="specGrid specRow">
+    <select id="pickL" class="specSel" aria-label="Batch label"></select>
+    <div class="specDot">.</div>
+    <select id="pickProfile" class="specSel" aria-label="Beam profile"></select>
+    <div class="specDot">.</div>
+    <select id="pickGrade" class="specSel" aria-label="Beam steel grade"></select>
+    <div class="specDot">.</div>
+    <select id="pickCase" class="specSel" aria-label="Case ID"></select>
+  </div>
 
-    <text x="125" y="78" text-anchor="middle" font-weight="400">.</text>
-
-    <rect x="140" y="55" rx="6" ry="6" width="90" height="34" fill="#ffffff" stroke="rgba(15,23,42,0.35)"/>
-    <text x="185" y="78" text-anchor="middle">270</text>
-
-    <text x="240" y="78" text-anchor="middle" font-weight="400">.</text>
-
-    <rect x="255" y="55" rx="6" ry="6" width="90" height="34" fill="#ffffff" stroke="rgba(15,23,42,0.35)"/>
-    <text x="300" y="78" text-anchor="middle">S235</text>
-
-    <text x="355" y="78" text-anchor="middle" font-weight="400">.</text>
-
-    <rect x="370" y="55" rx="6" ry="6" width="80" height="34" fill="#ffffff" stroke="rgba(15,23,42,0.35)"/>
-    <text x="410" y="78" text-anchor="middle">C25</text>
-  </g>
-
-  <!-- Brackets and labels above -->
-  <g stroke="rgba(15,23,42,0.55)" stroke-width="1.2" fill="none" font-family="Arial, sans-serif" font-size="12">
-    <!-- Batch label bracket -->
-    <path d="M 60 42 L 115 42" />
-    <path d="M 60 42 L 60 46" />
-    <path d="M 115 42 L 115 46" />
-    <text x="87.5" y="34" text-anchor="middle">Batch label</text>
-
-    <!-- Case combination bracket -->
-    <path d="M 370 42 L 450 42" />
-    <path d="M 370 42 L 370 46" />
-    <path d="M 450 42 L 450 46" />
-    <text x="410" y="34" text-anchor="middle">Combination of (<tspan font-style="italic">S</tspan>/<tspan font-style="italic">h</tspan>) and (<tspan font-style="italic">d</tspan><tspan baseline-shift="sub" font-size="10">o</tspan>/<tspan font-style="italic">h</tspan>)</text>
-  </g>
-
-  <!-- Arrows and labels below -->
-  <g stroke="rgba(15,23,42,0.65)" stroke-width="1.2" fill="none" marker-end="url(#arrow)">
-    <line x1="87.5" y1="92" x2="87.5" y2="112"/>
-    <line x1="185" y1="92" x2="185" y2="112"/>
-    <line x1="300" y1="92" x2="300" y2="112"/>
-  </g>
-  <g font-family="Arial, sans-serif" font-size="12" fill="rgba(15,23,42,0.85)">
-    <text x="87.5" y="134" text-anchor="middle">Beam span-to-depth</text>
-    <text x="87.5" y="148" text-anchor="middle">ratio</text>
-
-    <text x="185" y="141" text-anchor="middle">Beam profile</text>
-
-    <text x="300" y="134" text-anchor="middle">Beam steel</text>
-    <text x="300" y="148" text-anchor="middle">grade</text>
-  </g>
-</svg>
+  <div class="specGrid specBottom" aria-hidden="true">
+    <div class="lbl">Beam span-to-depth<br>ratio</div>
+    <div></div>
+    <div class="lbl">Beam profile</div>
+    <div></div>
+    <div class="lbl">Beam steel<br>grade</div>
+    <div></div>
+    <div class="lbl">Case ID</div>
+  </div>
+</div>
 <div class="figcap"><i>Specimen classification</i></div>
 
     </div>
@@ -611,6 +607,10 @@
     modalImg: document.getElementById('modalImg'),
     modalTitle: document.getElementById('modalTitle'),
     modalOpen: document.getElementById('modalOpen'),
+    pickL: document.getElementById('pickL'),
+    pickProfile: document.getElementById('pickProfile'),
+    pickGrade: document.getElementById('pickGrade'),
+    pickCase: document.getElementById('pickCase'),
   };
 
   // Helpers
@@ -674,6 +674,62 @@
     sh: shVals.includes(60) ? 60 : (shVals.find(v=>v!==0) ?? 0),
   };
 
+
+  // Specimen classification selector (interactive dropdowns)
+  let caseMap = new Map();
+
+  function profileNumber(p) {
+    const m = String(p || '').match(/(\d+)/);
+    return m ? m[1] : String(p || '');
+  }
+
+  function fillSelect(selectEl, items, valueFn, labelFn) {
+    if (!selectEl) return;
+    selectEl.innerHTML = '';
+    for (const it of items) {
+      const opt = document.createElement('option');
+      opt.value = String(valueFn(it));
+      opt.textContent = labelFn(it);
+      selectEl.appendChild(opt);
+    }
+  }
+
+  function syncSpecPickFromSel(caseIdOverride) {
+    if (el.pickL) el.pickL.value = String(sel.L);
+    if (el.pickProfile) el.pickProfile.value = String(sel.pIdx);
+    if (el.pickGrade) el.pickGrade.value = String(sel.gIdx);
+    const cid = caseIdOverride || caseIdFromDoSh(sel.do, sel.sh);
+    if (el.pickCase && cid) el.pickCase.value = cid;
+  }
+
+  // Populate L, profile, grade dropdowns
+  fillSelect(el.pickL, Lvals, (x) => x, (x) => String(x));
+  fillSelect(el.pickProfile, profiles.map((p, i) => ({p, i})), (o) => o.i, (o) => profileNumber(o.p));
+  fillSelect(el.pickGrade, grades.map((g, i) => ({g, i})), (o) => o.i, (o) => o.g);
+
+  if (el.pickL) {
+    el.pickL.addEventListener('change', () => {
+      sel.L = parseFloat(el.pickL.value);
+      syncSlidersFromSel();
+      updateAll();
+    });
+  }
+  if (el.pickProfile) {
+    el.pickProfile.addEventListener('change', () => {
+      sel.pIdx = parseInt(el.pickProfile.value, 10) || 0;
+      syncSlidersFromSel();
+      updateAll();
+    });
+  }
+  if (el.pickGrade) {
+    el.pickGrade.addEventListener('change', () => {
+      sel.gIdx = parseInt(el.pickGrade.value, 10) || 0;
+      syncSlidersFromSel();
+      updateAll();
+    });
+  }
+
+
   function syncSlidersFromSel() {
     el.slProfile.value = String(sel.pIdx);
     el.slGrade.value = String(sel.gIdx);
@@ -708,6 +764,43 @@
 
   // Case matrix interactions
   const caseCells = Array.from(document.querySelectorAll('#caseMatrix td.case-cell'));
+
+
+  // Populate case dropdown from Table 1.5 (C00 to C99) and add C100 (full section)
+  if (el.pickCase) {
+    caseMap = new Map();
+    for (const td of caseCells) {
+      const cid = td.dataset.case;
+      const doPct = parseFloat(td.dataset.do);
+      const shPct = parseFloat(td.dataset.sh);
+      if (cid && Number.isFinite(doPct) && Number.isFinite(shPct)) {
+        caseMap.set(cid, {do: doPct, sh: shPct});
+      }
+    }
+    caseMap.set('C100', {do: 0, sh: 0});
+
+    const order = (cid) => (cid === 'C100' ? 100 : (parseInt(String(cid).slice(1), 10) || 0));
+    const caseIds = Array.from(caseMap.keys()).sort((a,b) => order(a) - order(b));
+
+    el.pickCase.innerHTML = '';
+    for (const cid of caseIds) {
+      const opt = document.createElement('option');
+      opt.value = cid;
+      opt.textContent = cid;
+      el.pickCase.appendChild(opt);
+    }
+
+    el.pickCase.addEventListener('change', () => {
+      const cid = el.pickCase.value;
+      const v = caseMap.get(cid);
+      if (!v) return;
+      sel.do = v.do;
+      sel.sh = v.sh;
+      syncSlidersFromSel();
+      updateAll();
+    });
+  }
+
   function highlightCaseCell(caseId) {
     for (const td of caseCells) td.classList.toggle('sel', td.dataset.case === caseId);
     // Full section button visual
@@ -1350,6 +1443,9 @@
     el.valDo.textContent = String(sel.do);
     el.valSh.textContent = String(sel.sh);
 
+    // Keep specimen classification dropdowns synchronised
+    syncSpecPickFromSel();
+
     const idx = currentRowIndex();
     if (idx === undefined) {
       el.modelName.textContent = 'No exact model found in dataset';
@@ -1370,6 +1466,8 @@
 
     const caseId = parseCaseId(r[schema.model]) || caseIdFromDoSh(sel.do, sel.sh);
     highlightCaseCell(caseId);
+
+    syncSpecPickFromSel(caseId);
 
     // Keep backbone plot synchronised with the current selection
     autoPlotUpdate(idx);
