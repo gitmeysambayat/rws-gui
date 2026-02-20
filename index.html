@@ -903,6 +903,7 @@
   function updateContours(modelCode) {
     if (!modelCode) {
       clearContours('Not available');
+      clearPlot();
       return;
     }
     const base = getContourBase();
@@ -1309,6 +1310,31 @@
     drawPlot();
   }
 
+  // Automatically keep the plot in sync with the currently selected model.
+  // Primary curve (index 0) follows the selection; additional curves are preserved.
+  function autoPlotUpdate(rowIndex) {
+    if (rowIndex === undefined || rowIndex === null) {
+      return;
+    }
+
+    const label = rows[rowIndex][schema.model];
+
+    if (curves.length === 0) {
+      curves = [{ label, rowIndex }];
+      activeCurve = 0;
+      renderLegend();
+      drawPlot();
+      return;
+    }
+
+    const changed = (curves[0].rowIndex !== rowIndex) || (curves[0].label !== label);
+    curves[0].rowIndex = rowIndex;
+    curves[0].label = label;
+    activeCurve = 0;
+    if (changed) renderLegend();
+    drawPlot();
+  }
+
   // Main update
   function updateAll() {
     // enforce do=0 -> sh=0 logic
@@ -1339,6 +1365,7 @@
       el.warn.style.display = 'block';
       el.warn.textContent = 'This combination is not available in the dataset.';
       clearContours('Not available');
+      clearPlot();
       return;
     }
 
@@ -1352,6 +1379,9 @@
 
     const caseId = parseCaseId(r[schema.model]) || caseIdFromDoSh(sel.do, sel.sh);
     highlightCaseCell(caseId);
+
+    // Keep backbone plot synchronised with the current selection
+    autoPlotUpdate(idx);
   }
 
   // Wire slider events
@@ -1393,12 +1423,10 @@
 
   // Open image links in a new tab
   function openContour(kind) {
-    const code = (el.modelName && el.modelName.textContent) ? el.modelName.textContent.trim() : '';
-    if (!code) return;
-    const base = getContourBase();
-    const url = kind === 'vm'
-      ? `${base}/VonMises/${code}_VonMises.png`
-      : `${base}/PEEQ/${code}_PEEQ.png`;
+    const url = (kind === 'vm')
+      ? (el.imgVonMises ? el.imgVonMises.getAttribute('src') : '')
+      : (el.imgPEEQ ? el.imgPEEQ.getAttribute('src') : '');
+    if (!url) return;
     window.open(url, '_blank', 'noopener');
   }
   if (el.btnOpenVm) el.btnOpenVm.addEventListener('click', () => openContour('vm'));
@@ -1409,7 +1437,6 @@
   syncSlidersFromSel();
   readSelFromSliders();
   updateAll();
-  clearPlot();
 
 })();
 </script>
